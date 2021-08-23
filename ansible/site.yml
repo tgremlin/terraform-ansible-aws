@@ -1,0 +1,29 @@
+--
+- become: yes
+  hosts: all
+  name: apache-install
+  tasks:
+    - name: Add the user 'gremlin' and add it to 'sudo'
+      user:
+        name: gremlin
+        group: sudo
+    - name: Add SSH key to 'gremlin'
+      authorized_key:
+        user: gremlin
+        key: "{{ lookup('file', 'INSTANCE_SSH' ) }}"
+    - name: Update all packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Install apache2
+      apt: name=apache2 update_cache=yes state=latest
+    - name: Enable mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - Restart apache2
+
+  handlers:
+    - name: Restart apache2
+      service: name=apache2 state=restarted     
+
