@@ -1,6 +1,8 @@
---
+---
 - become: yes
   hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   name: apache-install
   tasks:
     - name: Add the user 'gremlin' and add it to 'sudo'
@@ -10,7 +12,7 @@
     - name: Add SSH key to 'gremlin'
       authorized_key:
         user: gremlin
-        key: "{{ lookup('file', 'INSTANCE_SSH' ) }}"
+        key: "{{ lookup('file', 'pvt_key' ) }}"
     - name: Update all packages
       apt:
         upgrade: dist
