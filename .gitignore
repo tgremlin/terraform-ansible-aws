@@ -1,4 +1,5 @@
-.*
+.terraform
+.git
 !/.gitignore
 *.tfvars
 *.pub
