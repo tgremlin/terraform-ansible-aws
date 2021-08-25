@@ -22,7 +22,7 @@
       apt: name=apache2 update_cache=yes state=latest
     - name: Copy index.html file
       copy:
-        src: /home/tgremlin/terraform/learnTerraformAWSInstance/ansible/roles/common/files/index.html
+        src: "{{ indexFilePath }}"
         dest: /var/www/html/index.html
         owner: gremlin
     - name: Enable mod_rewrite

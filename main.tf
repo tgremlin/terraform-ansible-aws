@@ -20,7 +20,6 @@ provider "aws" {
   region  = "us-east-1"
 }
 
-
 variable "instance_name" {
   description   = "Value of the name tag for the EC2 instance"
   type          = string
@@ -144,7 +143,7 @@ resource "aws_instance" "bastion" {
   }
 
   provisioner "local-exec" {
-      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' /home/tgremlin/terraform/learnTerraformAWSInstance/ansible/site.yml"
+      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' -e 'indexFilePath=${var.indexFilePath}' ${var.siteFilePath}"
   }
 
 }
@@ -162,12 +161,12 @@ resource "aws_eip" "eip-bastion" {
 
 #### The ansible inventory file
 resource "local_file" "AnsibleInventory" {
-  content = templatefile("/home/tgremlin/terraform/learnTerraformAWSInstance/ansible/staging/inventory.tmpl",
+  content = templatefile("${var.localPath}/learnTerraformAWSInstance/ansible/staging/inventory.tmpl",
     {
       bastion-dns = aws_eip.eip-bastion.public_dns,
       bastion-ip  = aws_eip.eip-bastion.public_ip,
       bastion-id  = aws_instance.bastion.id
     }
   )
-  filename = "/home/tgremlin/terraform/learnTerraformAWSInstance/ansible/staging/inventory"
+  filename = "var.inventoryFilePath"
 }
