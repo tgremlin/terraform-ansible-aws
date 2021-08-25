@@ -8,12 +8,12 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "at-portfolio-packer-tf-ubuntu"
+  ami_name      = "at-portfolio-packer-tf-ubuntu-18-NoUnattanded"
   instance_type = "t2.micro"
   region        = "us-east-1"
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*"
+      name                = "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -28,5 +28,10 @@ build {
   sources = [
     "source.amazon-ebs.ubuntu"
   ]
+  provisioner "shell" {
+    inline = [
+      "sudo apt remove unattended-upgrades -y"
+    ]
+  }
 }
 

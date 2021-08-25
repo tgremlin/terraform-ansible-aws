@@ -12,7 +12,7 @@
     - name: Add SSH key to 'gremlin'
       authorized_key:
         user: gremlin
-        key: "{{ lookup('file', 'pvt_key' ) }}"
+        key: "{{ lookup('file', pub_key ) }}"
     - name: Update all packages
       apt:
         upgrade: dist
@@ -20,6 +20,11 @@
         cache_valid_time: 3600
     - name: Install apache2
       apt: name=apache2 update_cache=yes state=latest
+    - name: Copy index.html file
+      copy:
+        src: /home/tgremlin/terraform/learnTerraformAWSInstance/ansible/roles/common/files/index.html
+        dest: /var/www/html/index.html
+        owner: gremlin
     - name: Enable mod_rewrite
       apache2_module: name=rewrite state=present
       notify:

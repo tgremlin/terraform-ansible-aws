@@ -51,12 +51,24 @@ resource "aws_vpc" "ansible_test" {
 
 resource "aws_security_group" "ssh" {
   name_prefix = "ssh"
-  description = "allow ssh from aws and work"
+  description = "allow ssh and http"
   vpc_id      = aws_vpc.ansible_test.id
   
   ingress {
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks  = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -110,7 +122,7 @@ resource "aws_route_table_association" "pub_association" {
 }
 
 resource "aws_instance" "bastion" {
-  ami = "ami-0d7144c36249641c2"
+  ami = "ami-0cc77a21e59868a1a"
   instance_type = "t2.micro"
   key_name  = aws_key_pair.instance_ssh.key_name
   vpc_security_group_ids = [aws_security_group.ssh.id]
@@ -132,7 +144,7 @@ resource "aws_instance" "bastion" {
   }
 
   provisioner "local-exec" {
-      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' /home/ubuntu/environment/learnTerraformAWSInstance/ansible/site.yml"
+      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' /home/tgremlin/terraform/learnTerraformAWSInstance/ansible/site.yml"
   }
 
 }
@@ -150,12 +162,12 @@ resource "aws_eip" "eip-bastion" {
 
 #### The ansible inventory file
 resource "local_file" "AnsibleInventory" {
-  content = templatefile("/home/ubuntu/environment/learnTerraformAWSInstance/ansible/staging/inventory.tmpl",
+  content = templatefile("/home/tgremlin/terraform/learnTerraformAWSInstance/ansible/staging/inventory.tmpl",
     {
       bastion-dns = aws_eip.eip-bastion.public_dns,
       bastion-ip  = aws_eip.eip-bastion.public_ip,
       bastion-id  = aws_instance.bastion.id
     }
   )
-  filename = "/home/ubuntu/environment/learnTerraformAWSInstance/ansible/staging/inventory"
+  filename = "/home/tgremlin/terraform/learnTerraformAWSInstance/ansible/staging/inventory"
 }
