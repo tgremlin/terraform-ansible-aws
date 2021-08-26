@@ -8,8 +8,8 @@ jobs:
     steps:
       - checkout
       - run:
-        name: terraform init & plan
-        command: |
-          terraform init -input=false
-          terraform plan -out tfapply
+          name: terraform init & plan
+          command: |
+            terraform init -input=false
+            terraform plan -out tfapply
           
