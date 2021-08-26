@@ -27,7 +27,7 @@ jobs:
           name: terraform init & plan
           command: |
             terraform init -input=false
-            terraform plan -out tfapply
+            terraform plan -out /tmp/project/terraform-ansible-aws-main/tfapply
       - persist_to_workspace:
           root: /tmp/project/terraform-ansible-aws-main
           paths:
