@@ -4,14 +4,17 @@ jobs:
   plan-apply:
     working_directory: /tmp/project
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: tgremlin82/atportfolio:ci
     steps:
       - checkout
+      - add_ssh_keys:
+        finerprints:
+          
       - run:
           name: terraform init & plan
           command: |
             terraform init -input=false
-            terraform plan -out tfapply -var-file secret.tfvars
+            terraform plan -out tfapply -var=""
       - persist_to_workspace:
           root: .
           paths:
