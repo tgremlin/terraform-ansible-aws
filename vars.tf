@@ -1,14 +1,14 @@
 variable "siteFilePath" {
     type = string
-    default = "/tmp/project/terraform-ansible-aws/ansible/site.yml"
+    default = "/tmp/project/terraform-ansible-aws-main-main/ansible/site.yml"
 }
 variable "inventoryFilePath" {
     type = string
-    default = "/tmp/project/terraform-ansible-aws/ansible/staging/inventory"
+    default = "/tmp/project/terraform-ansible-aws-main/ansible/staging/inventory"
 }
 variable "indexFilePath" {
     type = string
-    default = "/tmp/project/terraform-ansible-aws/ansible/roles/common/files/index.html"
+    default = "/tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/index.html"
 }
 variable "localPath" {
     type = string
@@ -17,10 +17,10 @@ variable "localPath" {
 
 variable "pub_key" {
     type = string
-    default = "/tmp/project/terraform-ansible-aws/ansible/roles/common/files/deployer.pub"
+    default = "/tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/deployer.pub"
 }
 
 variable "pvt_key" {
   type = string
-  default = "/tmp/project/deployer.pem"
+  default = "/tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/deployer.pem"
 }
