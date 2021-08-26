@@ -37,6 +37,10 @@ data "aws_secretsmanager_secret" "ssh_priv" {
   arn = "arn:aws:secretsmanager:us-east-1:559481597659:secret:instance_ssh_priv-Wv8E8K"
 }
 
+variable "pvt_key" {
+  type = string
+  default = data.aws_secretsmanager_secret.ssh_priv.secret_string
+}
 resource "aws_key_pair" "instance_ssh" {
   key_name = "deployer-key"
   public_key = file(var.pub_key)

@@ -24,8 +24,3 @@ variable "pub_key_path" {
   type = string
   default = "/tmp/project/terraform-ansible-aws/ansible/roles/common/files/"
 }
-
-variable "pvt_key" {
-  type = string
-  default = data.aws_secretsmanager_secret.ssh_priv.secret_string
-}
