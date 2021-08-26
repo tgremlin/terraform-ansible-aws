@@ -30,46 +30,46 @@ jobs:
             terraform init -input=false
             terraform plan -out /tmp/project/terraform-ansible-aws-main/tfapply
       - persist_to_workspace:
-          root: /tmp/project/terraform-ansible-aws-main
+          root: .
           paths:
-            - .
+            - terraform-ansible-aws-main/
 
   apply:
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /tmp/project/terraform-ansible-aws-main
+          at: /tmp/project
       - run:
           name: terraform
           command: |
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
-          root: /tmp/project/terraform-ansible-aws-main
+          root: .
           paths:
-            - .
+            - terraform-ansible-aws-main/
 
   plan-destroy:
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /tmp/project/terraform-ansible-aws-main
+          at: /tmp/project
       - run:
           name: terraform create destroy plan
           command: |
             terraform plan -destroy -out tfdestroy
       - persist_to_workspace:
-          root: /tmp/project/terraform-ansible-aws-main
+          root: .
           paths:
-            - .
+            - terraform-ansible-aws-main/
 
   destroy:
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: .
+          at: /tmp/project
       - run:
           name: terraform destroy
           command: |
