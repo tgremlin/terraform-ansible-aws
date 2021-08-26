@@ -159,7 +159,7 @@ resource "aws_eip" "eip-bastion" {
 
 #### The ansible inventory file
 resource "local_file" "AnsibleInventory" {
-  content = templatefile("${var.localPath}/learnTerraformAWSInstance/ansible/staging/inventory.tmpl",
+  content = templatefile("${var.inventoryTemplate}",
     {
       bastion-dns = aws_eip.eip-bastion.public_dns,
       bastion-ip  = aws_eip.eip-bastion.public_ip,
