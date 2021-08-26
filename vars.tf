@@ -22,5 +22,5 @@ variable "pub_key" {
 
 variable "pub_key" {
   type = string
-  default = "/tmp/project/terraform-ansible-aws/ansible/roles/common/files/deployer.pem"
+  default = "/tmp/project/deployer.pem"
 }
