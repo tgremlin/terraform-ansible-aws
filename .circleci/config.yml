@@ -13,6 +13,7 @@ jobs:
             aws configure --profile staging set region $AWS_DEFAULT_REGION
             aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
             aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
+            git clone https://github.com/tgremlin/terraform-ansible-aws.git
             aws secretsmanager get-secret-value --secret-id $AWS_SECRET_SSH --query 'SecretString' --output text > /tmp/project/deployer.pem
             terraform init -input=false
             terraform plan -out tfapply
