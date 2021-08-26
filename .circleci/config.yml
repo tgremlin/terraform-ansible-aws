@@ -11,4 +11,5 @@ jobs:
         name: terraform init & plan
         command: |
           terraform init -input=false
+          terraform plan -out tfapply
           
