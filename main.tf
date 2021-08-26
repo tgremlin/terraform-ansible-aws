@@ -134,13 +134,13 @@ resource "aws_instance" "bastion" {
   }
 
   provisioner "remote-exec" {
-      inline = ["sudo apt update", "sudo apt install python3 -y", "echo ${data.aws_secretsmanager_secret.ssh_priv.secret_string} > ${pvt_key_path}deployer.pem" ,"echo Done!"]
+      inline = ["sudo apt update", "sudo apt install python3 -y", "echo ${ssh_priv.aws_secretsmanager_secret.ssh_priv.secret_string} > ${pvt_key_path}deployer.pem" ,"echo Done!"]
 
       connection {
           host          = self.public_ip
           type          = "ssh"
           user          = "ubuntu"
-          private_key   = data.aws_secretsmanager_secret.ssh_priv.secret_string
+          private_key   = ssh_priv.aws_secretsmanager_secret.ssh_priv.secret_string
       }
   }
 
