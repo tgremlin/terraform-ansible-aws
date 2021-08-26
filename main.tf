@@ -25,13 +25,16 @@ variable "instance_name" {
   type          = string
   default       = "Bastion"
 }
-variable "pvt_key" {}
-variable "pub_key" {}
+
 variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
 variable "pub_sub_cidr" {
   default = "10.0.10.0/24"
+}
+
+data "aws_secretsmanager_secret" "ssh_priv" {
+  arn = "arn:aws:secretsmanager:us-east-1:559481597659:secret:instance_ssh_priv-Wv8E8K"
 }
 
 resource "aws_key_pair" "instance_ssh" {
@@ -132,13 +135,13 @@ resource "aws_instance" "bastion" {
   }
 
   provisioner "remote-exec" {
-      inline = ["sudo apt update", "sudo apt install python3 -y", "echo Done!"]
+      inline = ["sudo apt update", "sudo apt install python3 -y", "echo ${pvt_key} > ${pvt_key_path}deployer.pem" ,"echo Done!"]
 
       connection {
           host          = self.public_ip
           type          = "ssh"
           user          = "ubuntu"
-          private_key   = file(var.pvt_key)
+          private_key   = data.aws_secretsmanager_secret.ssh_priv.secret_string
       }
   }
 
