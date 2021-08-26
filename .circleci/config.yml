@@ -31,7 +31,7 @@ jobs:
       - persist_to_workspace:
           root: files
           paths:
-            - /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/
+            - ~/terraform-ansible-aws-main/ansible/roles/common/files/
 
   apply:
     docker:
@@ -46,7 +46,7 @@ jobs:
       - persist_to_workspace:
           root: files
           paths:
-            - /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/
+            - ~/terraform-ansible-aws-main/ansible/roles/common/files/
 
   plan-destroy:
     docker:
@@ -61,7 +61,7 @@ jobs:
       - persist_to_workspace:
           root: files
           paths:
-            - /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/deployer.pem
+            - ~/terraform-ansible-aws-main/ansible/roles/common/files/deployer.pem
 
   destroy:
     docker:
