@@ -30,15 +30,12 @@ jobs:
             terraform init -input=false
             terraform plan -out tfapply
       - persist_to_workspace:
-          root: /tmp/project
+          root: /tmp/
           paths:
-            - .
-            - terraform-ansible-aws-main/
-            - terraform-ansible-aws-main/ansible
-            - terraform-ansible-aws-main/ansible/common/
-            - terraform-ansible-aws-main/ansible/common/files/
+            - project
 
   apply:
+    working_directory: /tmp/project    
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
@@ -49,15 +46,12 @@ jobs:
           command: |
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
-          root: /tmp/project
+          root: /tmp/
           paths:
-            - .
-            - terraform-ansible-aws-main/
-            - terraform-ansible-aws-main/ansible
-            - terraform-ansible-aws-main/ansible/common/
-            - terraform-ansible-aws-main/ansible/common/files/
+            - project
 
   plan-destroy:
+    working_directory: /tmp/project      
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
@@ -68,15 +62,12 @@ jobs:
           command: |
             terraform plan -destroy -out tfdestroy
       - persist_to_workspace:
-          root: /tmp/project
+          root: /tmp/
           paths:
-            - .
-            - terraform-ansible-aws-main/
-            - terraform-ansible-aws-main/ansible
-            - terraform-ansible-aws-main/ansible/common/
-            - terraform-ansible-aws-main/ansible/common/files/
+            - project
 
   destroy:
+    working_directory: /tmp/project  
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
