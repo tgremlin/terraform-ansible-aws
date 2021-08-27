@@ -28,11 +28,15 @@ jobs:
           command: |
             pwd
             terraform init -input=false
-            terraform plan -out /tmp/project/terraform-ansible-aws-main/tfapply
+            terraform plan -out tfapply
       - persist_to_workspace:
           root: /tmp/project
           paths:
             - .
+            - terraform-ansible-aws-main/
+            - terraform-ansible-aws-main/ansible
+            - terraform-ansible-aws-main/ansible/common/
+            - terraform-ansible-aws-main/ansible/common/files/
 
   apply:
     docker:
@@ -48,6 +52,10 @@ jobs:
           root: /tmp/project
           paths:
             - .
+            - terraform-ansible-aws-main/
+            - terraform-ansible-aws-main/ansible
+            - terraform-ansible-aws-main/ansible/common/
+            - terraform-ansible-aws-main/ansible/common/files/
 
   plan-destroy:
     docker:
@@ -63,6 +71,10 @@ jobs:
           root: /tmp/project
           paths:
             - .
+            - terraform-ansible-aws-main/
+            - terraform-ansible-aws-main/ansible
+            - terraform-ansible-aws-main/ansible/common/
+            - terraform-ansible-aws-main/ansible/common/files/
 
   destroy:
     docker:
