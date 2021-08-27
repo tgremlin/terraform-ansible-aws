@@ -33,6 +33,7 @@ jobs:
           command: |
             mkdir /tmp/project/files
             cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /tmp/project/files
+            cp /tmp/project/tfapply /tmp/project/files
             ls /tmp/project/files
       - persist_to_workspace:
           root: files
