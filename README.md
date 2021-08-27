@@ -11,7 +11,7 @@ To run, download or clone repository, and you must update the following values a
     "/home/ubuntu/environment/" > "/home/YOUR_USER/projects"
   - pub_key: Enter a path to a public SSH key (this key will be uploaded to AWS and used to connect to your instance).
   - pvt_key: Enter a path to the private key (must be PEM format). This code will retrieve the key from an AWS secrets manager store (stored as plain text in secrets manager),         using the following code: 
-    ```yml
+    ```yaml
     aws secretsmanager get-secret-value --secret-id YOUR_AWS_SECRET_NAME --query 'SecretString' --output text > /tmp/project/ansible/roles/common/files/deployer.pem
     ```
     This retrieves the text value, and saves it to "deployer.pem". This code is found in the config.yml file in the .circleci directory. Feel free to remove this directory if you     are not deploying with a CircleCI pipeline. Just make sure the keys are present in the path stated in the vars.tf file. Also note:
@@ -28,4 +28,12 @@ To run, download or clone repository, and you must update the following values a
     }
     ```
  
-After updatign vars.tf
+After updating of vars.tf and main.tf, the following code in site.yml should be updated for your descired username:
+  ```yaml
+  tasks:
+    - name: Add the user 'gremlin' and add it to 'sudo'
+      user:
+        name: gremlin
+        group: sudo
+    - name: Add SSH key to 'gremlin'
+  ```
