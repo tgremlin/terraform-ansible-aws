@@ -54,8 +54,7 @@ jobs:
       - run:
           name: terraform
           command: |
-            pwd
-            ls /files
+            terraform init -input=false
             terraform apply -auto-approve /files/tfapply
       - persist_to_workspace:
           root: /files
@@ -77,6 +76,7 @@ jobs:
       - run:
           name: terraform create destroy plan
           command: |
+            terraform init -input=false
             terraform plan -destroy -out /files/tfdestroy
       - persist_to_workspace:
           root: /files
@@ -98,6 +98,7 @@ jobs:
       - run:
           name: terraform destroy
           command: |
+            terraform init -input=false
             terraform apply -auto-approve /files/tfdestroy
 workflows:
   version: 2
