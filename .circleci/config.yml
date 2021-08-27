@@ -20,6 +20,7 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
+            pwd
             terraform init -input=false
             terraform plan -out tfapply
       - persist_to_workspace:
@@ -32,20 +33,20 @@ jobs:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /files
+          at: /tmp/project
       - run:
           name: run AWS configure
           command: |
+            pwd
             aws configure --profile staging set region $AWS_DEFAULT_REGION
             aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
             aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
       - run:
           name: terraform
           command: |
-            cd /files && ls -a
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
-          root: /files
+          root: .
           paths:
             - .
 
@@ -54,7 +55,7 @@ jobs:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /files
+          at: /tmp/project
       - run:
           name: run AWS configure
           command: |
@@ -64,10 +65,9 @@ jobs:
       - run:
           name: terraform create destroy plan
           command: |
-            cd /files
-            terraform plan -destroy -out /files/tfdestroy
+            terraform plan -destroy -out tfdestroy
       - persist_to_workspace:
-          root: /files
+          root: .
           paths:
             - .
 
@@ -76,7 +76,7 @@ jobs:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /files
+          at: /tmp/project
       - run:
           name: run AWS configure
           command: |
@@ -86,8 +86,7 @@ jobs:
       - run:
           name: terraform destroy
           command: |
-            cd /files
-            terraform apply -auto-approve /files/tfdestroy
+            terraform apply -auto-approve tfdestroy
 workflows:
   version: 2
   plan_approve_apply:
