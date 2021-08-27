@@ -125,7 +125,6 @@ workflows:
           type: approval
           requires:
             - plan-destroy
-            - slack/on-hold
       - destroy:
           requires:
             - hold-destroy
