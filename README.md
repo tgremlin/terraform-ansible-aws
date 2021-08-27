@@ -199,9 +199,9 @@ workflows:
             - hold-destroy
 ```
 See screenshots below of approval process:
-![Hold Apply](https://github.com/tgremlin/terraform-ansible-aws/blob/main/hold_apply.PNG)
+- ![Hold Apply](https://github.com/tgremlin/terraform-ansible-aws/blob/main/hold_apply.PNG)
 2nd step:
-![Hold Approve](https://github.com/tgremlin/terraform-ansible-aws/blob/main/approve_apply.PNG)
+- ![Hold Approve](https://github.com/tgremlin/terraform-ansible-aws/blob/main/approve_apply.PNG)
 # To Do
 
 - [ ] Optomize docker image size
