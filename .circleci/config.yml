@@ -109,6 +109,7 @@ workflows:
           mentions: '@tenisonallan'
           requires:
             - plan-apply
+            - plan-destroy
       - hold-apply:
           type: approval
           requires:
