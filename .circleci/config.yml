@@ -32,6 +32,10 @@ jobs:
           root: .
           paths:
             - .
+      - run:
+          name: test
+          command: |
+            ls -a /
 
   apply:   
     docker:
