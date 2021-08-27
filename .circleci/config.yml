@@ -12,13 +12,7 @@ jobs:
           command: |
             aws configure --profile staging set region $AWS_DEFAULT_REGION
             aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
-            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
-      - run:
-          name: download repository
-          command: |
-            wget https://github.com/tgremlin/terraform-ansible-aws/archive/refs/heads/main.zip
-            unzip main.zip
-            rm main.zip       
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY  
       - run:
           name: save AWS secrets ssh private key to file
           command: |
@@ -28,12 +22,6 @@ jobs:
           command: |
             terraform init -input=false
             terraform plan -out tfapply
-      - run:
-          name: Copy needed files
-          command: |
-            cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /tmp/project
-            cp ~/.aws/* /tmp/project
-            ls -a /tmp/project
       - persist_to_workspace:
           root: .
           paths:
@@ -55,7 +43,7 @@ jobs:
           name: terraform
           command: |
             cd /files && ls -a
-            terraform apply -auto-approve /files/tfapply
+            terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: /files
           paths:
