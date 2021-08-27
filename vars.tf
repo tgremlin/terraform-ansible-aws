@@ -12,14 +12,14 @@ variable "inventoryFilePath" {
 }
 variable "indexFilePath" {
     type = string
-    default = "/tmp/project/ansible/roles/common/tmp/project/index.html"
+    default = "/tmp/project/ansible/roles/common/files/index.html"
 }
 variable "pub_key" {
     type = string
-    default = "/tmp/project/ansible/roles/common/tmp/project/deployer.pub"
+    default = "/tmp/project/ansible/roles/common/files/deployer.pub"
 }
 
 variable "pvt_key" {
   type = string
-  default = "/tmp/project/ansible/roles/common/tmp/project/deployer.pem"
+  default = "/tmp/project/ansible/roles/common/files/deployer.pem"
 }
