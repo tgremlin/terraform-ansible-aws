@@ -106,6 +106,7 @@ workflows:
     jobs:
       - plan-apply
       - slack/on-hold:
+          mentions: '@tenisonallan'
           requires:
             - plan-apply
       - hold-apply:
@@ -119,11 +120,14 @@ workflows:
       - plan-destroy:
           requires:
             - apply
+      - slack/on-hold:
+          mentions: '@tenisonallan'
+          requires:
+            - hold-destroy
       - hold-destroy:
           type: approval
           requires:
             - plan-destroy
-            - slack/on-hold
       - destroy:
           requires:
             - hold-destroy
