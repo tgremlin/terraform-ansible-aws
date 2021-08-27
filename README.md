@@ -30,10 +30,37 @@ To run, download or clone repository, and you must update the following values a
  
 After updating of vars.tf and main.tf, the following code in site.yml should be updated for your descired username:
   ```yaml
-  tasks:
     - name: Add the user 'gremlin' and add it to 'sudo'
       user:
         name: gremlin
         group: sudo
     - name: Add SSH key to 'gremlin'
+      authorized_key:
+        user: gremlin
+        key: "{{ lookup('file', pub_key ) }}"
   ```
+
+The Ansible inventory file is dynamically generated using the following code from main.tf and inventory.tmpl (found in ansible-->roles-->common-->files):
+```yaml
+#### The ansible inventory file #########
+## These values will be used to create ##
+## a dynamic ansible inventory file    ##
+## populated with values from the new  ##
+## EC2 instance                        ##
+resource "local_file" "AnsibleInventory" {
+  content = templatefile("${var.inventoryTemplate}",
+    {
+      bastion-dns = aws_eip.eip-bastion.public_dns,
+      bastion-ip  = aws_eip.eip-bastion.public_ip,
+      bastion-id  = aws_instance.bastion.id
+    }
+  )
+  filename = "var.inventoryFilePath"
+}
+```
+These variable values are gathered from the newly created EC2 instance, and the inventory file is created in the path from the inventoryFilePath variable. The inventory.tmpl code looks like this:
+```
+[bastion]
+${bastion-dns} asnible_host=${bastion-ip} # ${bastion-id}
+```
+If you change the name of the EC2 instance, you must update it here as well. 
