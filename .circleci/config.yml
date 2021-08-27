@@ -29,6 +29,7 @@ jobs:
             - .
 
   apply:   
+    working_directory: /tmp/project  
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
@@ -51,6 +52,7 @@ jobs:
             - .
 
   plan-destroy: 
+    working_directory: /tmp/project
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
@@ -72,6 +74,7 @@ jobs:
             - .
 
   destroy:
+    working_directory: /tmp/project
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
