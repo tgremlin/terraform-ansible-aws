@@ -30,9 +30,9 @@ jobs:
             terraform init -input=false
             terraform plan -out tfapply
       - persist_to_workspace:
-          root: tmp
+          root: .
           paths:
-            - project
+            - terraform-ansible-aws-main
 
   apply:   
     docker:
@@ -45,9 +45,9 @@ jobs:
           command: |
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
-          root: tmp
+          root: .
           paths:
-            - project
+            - terraform-ansible-aws-main
 
   plan-destroy: 
     docker:
@@ -60,9 +60,9 @@ jobs:
           command: |
             terraform plan -destroy -out tfdestroy
       - persist_to_workspace:
-          root: tmp
+          root: .
           paths:
-            - project
+            - terraform-ansible-aws-main
 
   destroy:
     docker:
