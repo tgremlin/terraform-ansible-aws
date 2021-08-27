@@ -32,6 +32,7 @@ jobs:
           name: Copy needed files
           command: |
             mkdir /tmp/project/files
+            ls -a /tmp/project
             cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /tmp/project/files
             cp /tmp/project/tfapply /tmp/project/files
             ls /tmp/project/files
