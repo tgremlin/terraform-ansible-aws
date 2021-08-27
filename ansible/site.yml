@@ -18,6 +18,9 @@
         upgrade: dist
         update_cache: yes
         cache_valid_time: 3600
+      register: process_locked
+      until: process_locked is not failed
+      retries: 100
     - name: Install apache2
       apt: name=apache2 update_cache=yes state=latest
     - name: Copy index.html file

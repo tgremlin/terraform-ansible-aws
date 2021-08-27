@@ -7,7 +7,7 @@ terraform {
   }
 
   required_version = ">= 0.14.9"
-  
+  # Variables cannot be defined in the backend block, must change to fit your backend method
   backend "s3" {
   bucket = "at-terraform-backends"
   key    = "terraform/learnTerraformAWSInstance/terraform.tfstate"
@@ -17,26 +17,13 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "us-east-1"
+  region  = var.region
 }
-
-variable "instance_name" {
-  description   = "Value of the name tag for the EC2 instance"
-  type          = string
-  default       = "Bastion"
-}
-
-variable "vpc_cidr" {
-  default = "10.0.0.0/16"
-}
-variable "pub_sub_cidr" {
-  default = "10.0.10.0/24"
-}
+# Creates the key pair in AWS used for SSH into instance
 resource "aws_key_pair" "instance_ssh" {
   key_name = "deployer-key"
   public_key = file(var.pub_key)
 }
-
 
 # VPC for new environment
 resource "aws_vpc" "ansible_test" {
@@ -45,7 +32,7 @@ resource "aws_vpc" "ansible_test" {
     Name = "ansible_test_vpc"
   }
 }
-
+# Security group to allow http and ssh from desicred CIDR block
 resource "aws_security_group" "ssh" {
   name_prefix = "ssh"
   description = "allow ssh and http"
@@ -55,31 +42,31 @@ resource "aws_security_group" "ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.all_ip_cidr]
   }
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks  = ["0.0.0.0/0"]
+    cidr_blocks  = [var.all_ip_cidr]
   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.all_ip_cidr]
   }
   egress {
     from_port  = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.all_ip_cidr]
   }
   egress {
     from_port =  443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.all_ip_cidr]
   }
 }
 # Internet Gateway
@@ -104,7 +91,7 @@ resource "aws_subnet" "public" {
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.ansible_test.id
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.all_ip_cidr
     gateway_id = aws_internet_gateway.ansible_test_igw.id
   }
   tags = {
@@ -117,10 +104,10 @@ resource "aws_route_table_association" "pub_association" {
   subnet_id = aws_subnet.public.id
   route_table_id = aws_route_table.public_rt.id
 }
-
+# EC2 instance in public subnet
 resource "aws_instance" "bastion" {
-  ami = "ami-0cc77a21e59868a1a"
-  instance_type = "t2.micro"
+  ami = var.ami_id
+  instance_type = var.instance_type
   key_name  = aws_key_pair.instance_ssh.key_name
   vpc_security_group_ids = [aws_security_group.ssh.id]
   subnet_id = aws_subnet.public.id
@@ -128,9 +115,10 @@ resource "aws_instance" "bastion" {
   tags = {
     Name = var.instance_name
   }
-
+# Here we run a remote execution on EC2 instance to ensure the instance
+# is created and running before we try and execute the ansible playbook
   provisioner "remote-exec" {
-      inline = ["sudo apt update", "sudo apt install python3 -y" ,"echo Done!"]
+      inline = ["sudo apt-get update", "sudo apt-get install python3 -y" ,"echo Done!"]
 
       connection {
           host          = self.public_ip
@@ -139,7 +127,7 @@ resource "aws_instance" "bastion" {
           private_key   = file(var.pvt_key)
       }
   }
-
+# Disabling ANSIBLE_HOST_KEY_CHECKING skips checking if server was connected beforehand
   provisioner "local-exec" {
       command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' -e 'indexFilePath=${var.indexFilePath}' ${var.siteFilePath}"
   }
@@ -157,7 +145,11 @@ resource "aws_eip" "eip-bastion" {
     }
   }
 
-#### The ansible inventory file
+#### The ansible inventory file #########
+## These values will be used to create ##
+## a dynamic ansible inventory file    ##
+## populated with values from the new  ##
+## EC2 instance                        ##
 resource "local_file" "AnsibleInventory" {
   content = templatefile("${var.inventoryTemplate}",
     {
