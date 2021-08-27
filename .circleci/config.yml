@@ -28,27 +28,29 @@ jobs:
           command: |
             terraform init -input=false
             terraform plan -out tfapply
+      - run:
+          name: Copy needed files
+          command: |
+            mkdir /files
+            copy /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /files
+            ls /files
       - persist_to_workspace:
-          root: .
+          root: /files
           paths:
             - .
-      - run:
-          name: test
-          command: |
-            ls ~/ && mkdir /test & cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/*.* /test
 
   apply:   
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /tmp/project
+          at: /files
       - run:
           name: terraform
           command: |
-            terraform apply -auto-approve tfapply
+            terraform apply -auto-approve /files/tfapply
       - persist_to_workspace:
-          root: .
+          root: /files
           paths:
             - .
 
@@ -57,13 +59,13 @@ jobs:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /tmp/project
+          at: /files
       - run:
           name: terraform create destroy plan
           command: |
-            terraform plan -destroy -out tfdestroy
+            terraform plan -destroy -out /files/tfdestroy
       - persist_to_workspace:
-          root: .
+          root: /files
           paths:
             - .
 
@@ -72,11 +74,11 @@ jobs:
       - image: tgremlin82/terraform_ansible_aws:1.0
     steps:
       - attach_workspace:
-          at: /tmp/project
+          at: /files
       - run:
           name: terraform destroy
           command: |
-            terraform apply -auto-approve tfdestroy
+            terraform apply -auto-approve /files/tfdestroy
 workflows:
   version: 2
   plan_approve_apply:
