@@ -16,7 +16,7 @@ jobs:
       - run:
           name: save AWS secrets ssh private key to file
           command: |
-            aws secretsmanager get-secret-value --secret-id $AWS_SECRET_SSH --query 'SecretString' --output text > /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/deployer.pem             
+            aws secretsmanager get-secret-value --secret-id $AWS_SECRET_SSH --query 'SecretString' --output text > /tmp/project/ansible/roles/common/files/deployer.pem             
       - run:
           name: terraform init & plan
           command: |
