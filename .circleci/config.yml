@@ -46,6 +46,12 @@ jobs:
       - attach_workspace:
           at: /files
       - run:
+          name: run AWS configure
+          command: |
+            aws configure --profile staging set region $AWS_DEFAULT_REGION
+            aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
+      - run:
           name: terraform
           command: |
             pwd
@@ -63,6 +69,12 @@ jobs:
       - attach_workspace:
           at: /files
       - run:
+          name: run AWS configure
+          command: |
+            aws configure --profile staging set region $AWS_DEFAULT_REGION
+            aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
+      - run:
           name: terraform create destroy plan
           command: |
             terraform plan -destroy -out /files/tfdestroy
@@ -77,6 +89,12 @@ jobs:
     steps:
       - attach_workspace:
           at: /files
+      - run:
+          name: run AWS configure
+          command: |
+            aws configure --profile staging set region $AWS_DEFAULT_REGION
+            aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
       - run:
           name: terraform destroy
           command: |
