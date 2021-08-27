@@ -136,7 +136,7 @@ resource "aws_instance" "bastion" {
           host          = self.public_ip
           type          = "ssh"
           user          = "ubuntu"
-          private_key   = var.pvt_key
+          private_key   = file(var.pvt_key)
       }
   }
 

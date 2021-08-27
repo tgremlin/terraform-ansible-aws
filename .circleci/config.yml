@@ -38,14 +38,12 @@ jobs:
       - run:
           name: run AWS configure
           command: |
-            ls -a
             aws configure --profile staging set region $AWS_DEFAULT_REGION
             aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
             aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY
       - run:
           name: terraform
           command: |
-            ls /tmp/project/ansible/roles/common/files/
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: .
