@@ -14,7 +14,7 @@ To run, download or clone repository, and you must update the following values a
     ```yaml
     aws secretsmanager get-secret-value --secret-id YOUR_AWS_SECRET_NAME --query 'SecretString' --output text > /tmp/project/ansible/roles/common/files/deployer.pem
     ```
-    This retrieves the text value, and saves it to "deployer.pem". This code is found in the config.yml file in the .circleci directory. Feel free to remove this directory if you     are not deploying with a CircleCI pipeline. Just make sure the keys are present in the path stated in the vars.tf file. Also note:
+    This retrieves the text value and saves it to "deployer.pem". This code is found in the config.yml file in the .circleci directory. Feel free to remove this directory if you     are not deploying with a CircleCI pipeline. Just make sure the keys are present in the path stated in the vars.tf file. Also note:
     You must make sure the keys are only accessible to your user, can do so by running "sudo chmod 0400" on your keys.
 - **Main.tf**
   - The following block must be updated for your backend options (variables cannot be used in the backend block):
@@ -81,11 +81,126 @@ If you plan to use CircleCI to deploy this terraform project, you must update th
 $AWS_DEFAULT_REGION = your desired default region (us-east-1)
 $AWS_ACCESS_KEY_ID = your aws access key for the user who this code will run as
 $AWS_SECRET_ACCESS_KEY = your aws secret access key
-This values will be masked in all the CircleCI outputs as long as you use environment varialbes, **DO NOT STORE THESE VALUES IN PLAIN TEXT!!!!***
+These values will be masked in all the CircleCI outputs as long as you use environment varialbes, **DO NOT STORE THESE VALUES IN PLAIN TEXT!!!!**
 
-This project also uses a custom docker image with all the dependcies to execute this terraform script:
+This project also uses a custom docker image with all the dependencies to execute this terraform script:
 
 ```yaml
     docker:
       - image: tgremlin82/terraform_ansible_aws:1.0
 ```
+The docker image is built using a CircleCI pipeline, the code can be viewed [here](https://github.com/tgremlin/terraform-ansible-docker)
+
+**Terraform Approval CircleCI workflow**
+This workflow has 3 phases,each phase first generates a terraform plan and saves the file to:
+- tfapply
+- tfdestroy
+You will see that CircleCI has two workflows for each phase:
+- plan-apply
+- apply
+- plan-destroy
+- destroy
+After each plan phase, a manual code review and approval is required in the CircleCI UI. See the config.yml:
+```yaml
+version: 2
+
+jobs:
+  plan-apply:
+    working_directory: /tmp/project
+    docker:
+      - image: tgremlin82/terraform_ansible_aws:1.0
+    steps:
+      - checkout
+      - run:
+          name: run AWS configure
+          command: |
+            aws configure --profile staging set region $AWS_DEFAULT_REGION
+            aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY  
+      - run:
+          name: save AWS secrets ssh private key to file
+          command: |
+            aws secretsmanager get-secret-value --secret-id $AWS_SECRET_SSH --query 'SecretString' --output text > /tmp/project/ansible/roles/common/files/deployer.pem             
+      - run:
+          name: terraform init & plan
+          command: |
+            pwd
+            terraform init -input=false
+            terraform plan -out tfapply
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  apply:   
+    working_directory: /tmp/project  
+    docker:
+      - image: tgremlin82/terraform_ansible_aws:1.0
+    steps:
+      - attach_workspace:
+          at: /tmp/project
+      - run:
+          name: terraform
+          command: |
+            terraform apply -auto-approve tfapply
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  plan-destroy: 
+    working_directory: /tmp/project
+    docker:
+      - image: tgremlin82/terraform_ansible_aws:1.0
+    steps:
+      - attach_workspace:
+          at: /tmp/project
+      - run:
+          name: terraform create destroy plan
+          command: |
+            terraform plan -destroy -out tfdestroy
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  destroy:
+    working_directory: /tmp/project
+    docker:
+      - image: tgremlin82/terraform_ansible_aws:1.0
+    steps:
+      - attach_workspace:
+          at: /tmp/project
+      - run:
+          name: terraform destroy
+          command: |
+            terraform apply -auto-approve tfdestroy
+workflows:
+  version: 2
+  plan_approve_apply:
+    jobs:
+      - plan-apply
+      - hold-apply:
+          type: approval
+          requires:
+            - plan-apply
+      - apply:
+          requires:
+            - hold-apply
+      - plan-destroy:
+          requires:
+            - apply
+      - hold-destroy:
+          type: approval
+          requires:
+            - plan-destroy
+      - destroy:
+          requires:
+            - hold-destroy
+```
+
+# To Do
+
+- [ ] Optomize docker image size
+- [ ] Add a slack channel notification when CircleCI is in a hold state
+- [ ] Add a slack channel notification when CircleCI workflows fail
