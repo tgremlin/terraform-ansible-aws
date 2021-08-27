@@ -2,6 +2,8 @@ version: 2
 orbs:
   slack: circleci/slack@4.4.4
 jobs:
+  slack/on-hold:
+
   plan-apply:
     working_directory: /tmp/project
     docker:
@@ -32,10 +34,7 @@ jobs:
           event: pass
           mentions: '@tenisonallan'
           template: basic_success_1
-      - slack/on-hold:
-          channel: $SLACK_DEFAULT_CHANNEL
-          mentions: '@tenisonallan'
-          
+
 
   apply:   
     working_directory: /tmp/project  
@@ -92,6 +91,7 @@ workflows:
           type: approval
           requires:
             - plan-apply
+            - slack/on-hold
       - apply:
           requires:
             - hold-apply
