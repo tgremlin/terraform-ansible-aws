@@ -15,7 +15,7 @@ To run, download or clone repository, and you must update the following values a
     You must make sure the keys are only accessible to your user, can do so by running "sudo chmod 0400" on your keys.
 - **Main.tf**
   - The following block must be updated for your backend options (variables cannot be used in the backend block):
-    '''terraform
+    '''hcl
     # Variables cannot be defined in the backend block, must change to fit your backend method
     backend "s3" {
     bucket = "at-terraform-backends"
