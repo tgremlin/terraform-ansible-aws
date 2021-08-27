@@ -31,9 +31,10 @@ jobs:
           paths:
             - .
       - slack/notify:
-          event: pass
+          event: fail
           mentions: '@tenisonallan'
-          template: basic_success_1
+          template: basic_fail_1
+
 
 
   apply:   
@@ -51,6 +52,14 @@ jobs:
           root: .
           paths:
             - .
+      - slack/notify:
+          event: pass
+          mentions: '@tenisonallan'
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          mentions: '@tenisonallan'
+          template: basic_fail_1
 
   plan-destroy: 
     working_directory: /tmp/project
@@ -67,6 +76,10 @@ jobs:
           root: .
           paths:
             - .
+      - slack/notify:
+          event: fail
+          mentions: '@tenisonallan'
+          template: basic_fail_1
 
   destroy:
     working_directory: /tmp/project
@@ -79,6 +92,14 @@ jobs:
           name: terraform destroy
           command: |
             terraform apply -auto-approve tfdestroy
+      - slack/notify:
+          event: pass
+          mentions: '@tenisonallan'
+          template: basic_success_1
+      - slack/notify:
+          event: fail
+          mentions: '@tenisonallan'
+          template: basic_fail_1
 workflows:
   version: 2
   plan_approve_apply:
@@ -102,6 +123,7 @@ workflows:
           type: approval
           requires:
             - plan-destroy
+            - slack/on-hold
       - destroy:
           requires:
             - hold-destroy
