@@ -45,6 +45,7 @@ jobs:
       - run:
           name: terraform
           command: |
+            ls /tmp/project/ansible/roles/common/files/
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: .
