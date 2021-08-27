@@ -54,7 +54,7 @@ jobs:
       - run:
           name: terraform
           command: |
-            cd /files
+            cd /files && ls -a
             terraform apply -auto-approve /files/tfapply
       - persist_to_workspace:
           root: /files
