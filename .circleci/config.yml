@@ -32,7 +32,7 @@ jobs:
           name: Copy needed files
           command: |
             mkdir /files
-            copy /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /files
+            cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /files
             ls /files
       - persist_to_workspace:
           root: /files
