@@ -200,6 +200,7 @@ workflows:
 ```
 See screenshots below of approval process:
 ![Hold Apply](https://github.com/tgremlin/terraform-ansible-aws/blob/main/hold_apply.PNG)
+
 ![Hold Approve](https://github.com/tgremlin/terraform-ansible-aws/blob/main/approve_apply.PNG)
 # To Do
 
