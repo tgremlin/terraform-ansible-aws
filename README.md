@@ -64,3 +64,28 @@ These variable values are gathered from the newly created EC2 instance, and the 
 ${bastion-dns} asnible_host=${bastion-ip} # ${bastion-id}
 ```
 If you change the name of the EC2 instance, you must update it here as well. 
+
+# CircleCI Deployments
+
+If you plan to use CircleCI to deploy this terraform project, you must update the following CircleCI environment variables:
+```yaml
+    steps:
+      - checkout
+      - run:
+          name: run AWS configure
+          command: |
+            aws configure --profile staging set region $AWS_DEFAULT_REGION
+            aws configure --profile staging set access_key $AWS_ACCESS_KEY_ID
+            aws configure --profile staging set secret_key $AWS_SECRET_ACCESS_KEY  
+```
+$AWS_DEFAULT_REGION = your desired default region (us-east-1)
+$AWS_ACCESS_KEY_ID = your aws access key for the user who this code will run as
+$AWS_SECRET_ACCESS_KEY = your aws secret access key
+This values will be masked in all the CircleCI outputs as long as you use environment varialbes, **DO NOT STORE THESE VALUES IN PLAIN TEXT!!!!***
+
+This project also uses a custom docker image with all the dependcies to execute this terraform script:
+
+```yaml
+    docker:
+      - image: tgremlin82/terraform_ansible_aws:1.0
+```
