@@ -2,15 +2,6 @@ variable "region" {
     type = string
     default = "us-east-1"
 }
-variable "s3_backend_buket" {
-    type = string
-    default = "at-terraform-backends"
-}
-variable "s3_backend_key" {
-    type = string
-    default = "terraform/learnTerraformAWSInstance/terraform.tfstate"
-}
-
 variable "instance_name" {
   description   = "Value of the name tag for the EC2 instance"
   type          = string

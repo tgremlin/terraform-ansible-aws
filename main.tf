@@ -7,11 +7,11 @@ terraform {
   }
 
   required_version = ">= 0.14.9"
-  
+  # Variables cannot be defined in the backend block, must change to fit your backend method
   backend "s3" {
-  bucket = var.s3_backend_buket
-  key    = var.s3_backend_key
-  region = var.region
+  bucket = "at-terraform-backends"
+  key    = "terraform/learnTerraformAWSInstance/terraform.tfstate"
+  region = "us-east-1"
   }
 }
 
@@ -19,6 +19,7 @@ provider "aws" {
   profile = "default"
   region  = var.region
 }
+# Creates the key pair in AWS used for SSH into instance
 resource "aws_key_pair" "instance_ssh" {
   key_name = "deployer-key"
   public_key = file(var.pub_key)
@@ -31,7 +32,7 @@ resource "aws_vpc" "ansible_test" {
     Name = "ansible_test_vpc"
   }
 }
-
+# Security group to allow http and ssh from desicred CIDR block
 resource "aws_security_group" "ssh" {
   name_prefix = "ssh"
   description = "allow ssh and http"
@@ -103,7 +104,7 @@ resource "aws_route_table_association" "pub_association" {
   subnet_id = aws_subnet.public.id
   route_table_id = aws_route_table.public_rt.id
 }
-
+# EC2 instance in public subnet
 resource "aws_instance" "bastion" {
   ami = var.ami_id
   instance_type = var.instance_type
@@ -114,7 +115,8 @@ resource "aws_instance" "bastion" {
   tags = {
     Name = var.instance_name
   }
-
+# Here we run a remote execution on EC2 instance to ensure the instance
+# is created and running before we try and execute the ansible playbook
   provisioner "remote-exec" {
       inline = ["sudo apt-get update", "sudo apt-get install python3 -y" ,"echo Done!"]
 
@@ -125,7 +127,7 @@ resource "aws_instance" "bastion" {
           private_key   = file(var.pvt_key)
       }
   }
-
+# Disabling ANSIBLE_HOST_KEY_CHECKING skips checking if server was connected beforehand
   provisioner "local-exec" {
       command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key}' -e 'indexFilePath=${var.indexFilePath}' ${var.siteFilePath}"
   }
@@ -143,7 +145,11 @@ resource "aws_eip" "eip-bastion" {
     }
   }
 
-#### The ansible inventory file
+#### The ansible inventory file #########
+## These values will be used to create ##
+## a dynamic ansible inventory file    ##
+## populated with values from the new  ##
+## EC2 instance                        ##
 resource "local_file" "AnsibleInventory" {
   content = templatefile("${var.inventoryTemplate}",
     {
