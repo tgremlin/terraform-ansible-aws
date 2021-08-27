@@ -32,6 +32,7 @@ jobs:
           name: Copy needed files
           command: |
             cp /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/* /tmp/project
+            cp ~/.aws/* /tmp/project
             ls -a /tmp/project
       - persist_to_workspace:
           root: .
