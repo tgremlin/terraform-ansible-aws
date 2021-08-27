@@ -1,5 +1,6 @@
 version: 2
-
+orbs:
+  slack: circleci/slack@4.4.4
 jobs:
   plan-apply:
     working_directory: /tmp/project
@@ -27,6 +28,11 @@ jobs:
           root: .
           paths:
             - .
+      - slack/notify:
+          event: pass
+          mentions: '@tenisonallan'
+          template: basic_success_1
+
 
   apply:   
     working_directory: /tmp/project  
@@ -76,6 +82,9 @@ workflows:
   plan_approve_apply:
     jobs:
       - plan-apply
+      - slack/on-hold:
+          requires:
+            - plan-apply
       - hold-apply:
           type: approval
           requires:
