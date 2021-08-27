@@ -26,13 +26,12 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
-            ls /tmp/project/terraform-ansible-aws-main/ansible/roles/common/files/
             terraform init -input=false
             terraform plan -out tfapply
       - persist_to_workspace:
           root: .
           paths:
-            - terraform-ansible-aws-main
+            - .
 
   apply:   
     docker:
@@ -47,7 +46,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - terraform-ansible-aws-main
+            - .
 
   plan-destroy: 
     docker:
@@ -62,7 +61,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - terraform-ansible-aws-main
+            - .
 
   destroy:
     docker:
